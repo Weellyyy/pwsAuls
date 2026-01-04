@@ -30,7 +30,7 @@ const adminController = {
     // Proses tambah konser
     addConcert: async (req, res) => {
         try {
-            const { title, artist, date, time, location, price, description, image_url } = req.body;
+            const { title, artist, date, time, location, price, description } = req.body;
 
             // Validasi
             if (!title || !artist || !date || !time || !location || !price) {
@@ -38,9 +38,12 @@ const adminController = {
                 return res.redirect('/admin/concerts/add');
             }
 
+            // Handle gambar - jika ada file upload, gunakan path file, jika tidak gunakan placeholder
+            const image_url = req.file ? `/uploads/concerts/${req.file.filename}` : 'https://via.placeholder.com/400x300';
+
             await db.query(
                 'INSERT INTO concerts (title, artist, date, time, location, price, description, image_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-                [title, artist, date, time, location, price, description || '', image_url || 'https://via.placeholder.com/400x300']
+                [title, artist, date, time, location, price, description || '', image_url]
             );
 
             req.flash('success', 'Konser berhasil ditambahkan');

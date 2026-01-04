@@ -87,7 +87,7 @@ const authController = {
     // Proses register
     register: async (req, res) => {
         try {
-            const { name, email, password, confirmPassword } = req.body;
+            const { name, email, password, confirmPassword, role } = req.body;
 
             // Validasi input
             if (!name || !email || !password || !confirmPassword) {
@@ -105,6 +105,9 @@ const authController = {
                 return res.redirect('/register');
             }
 
+            // Validasi role (hanya admin atau user yang diperbolehkan)
+            const userRole = role && (role === 'admin' || role === 'user') ? role : 'user';
+
             // Cek apakah email sudah terdaftar
             const [existingUsers] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
             
@@ -116,11 +119,13 @@ const authController = {
             // Hash password
             const hashedPassword = await bcrypt.hash(password, 10);
 
-            // Insert user baru
+            // Insert user baru dengan role dari request atau default 'user'
             await db.query(
                 'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)',
-                [name, email, hashedPassword, 'user']
+                [name, email, hashedPassword, userRole]
             );
+
+            console.log('Register Success:', { email, role: userRole });
 
             req.flash('success', 'Registrasi berhasil! Silakan login');
             res.redirect('/login');
