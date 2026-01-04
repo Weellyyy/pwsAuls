@@ -82,7 +82,7 @@ const adminController = {
     editConcert: async (req, res) => {
         try {
             const { id } = req.params;
-            const { title, artist, date, time, location, price, description, image_url } = req.body;
+            const { title, artist, date, time, location, price, description } = req.body;
 
             // Validasi
             if (!title || !artist || !date || !time || !location || !price) {
@@ -90,9 +90,20 @@ const adminController = {
                 return res.redirect(`/admin/concerts/edit/${id}`);
             }
 
+            // Ambil data konser lama untuk mendapatkan image_url yang ada
+            const [concerts] = await db.query('SELECT image_url FROM concerts WHERE id = ?', [id]);
+            
+            if (concerts.length === 0) {
+                req.flash('error', 'Konser tidak ditemukan');
+                return res.redirect('/admin/dashboard');
+            }
+
+            // Handle gambar - jika ada file upload baru, gunakan yang baru, jika tidak pertahankan yang lama
+            const image_url = req.file ? `/uploads/concerts/${req.file.filename}` : concerts[0].image_url;
+
             await db.query(
                 'UPDATE concerts SET title = ?, artist = ?, date = ?, time = ?, location = ?, price = ?, description = ?, image_url = ? WHERE id = ?',
-                [title, artist, date, time, location, price, description || '', image_url || 'https://via.placeholder.com/400x300', id]
+                [title, artist, date, time, location, price, description || '', image_url, id]
             );
 
             req.flash('success', 'Konser berhasil diupdate');

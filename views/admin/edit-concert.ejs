@@ -22,7 +22,7 @@
                 <div class="alert alert-error"><%= error %></div>
             <% } %>
 
-            <form method="POST" action="/admin/concerts/edit/<%= concert.id %>">
+            <form method="POST" action="/admin/concerts/edit/<%= concert.id %>" enctype="multipart/form-data">
                 <div class="form-group">
                     <label>Judul Konser *</label>
                     <input type="text" name="title" required value="<%= concert.title %>">
@@ -59,8 +59,15 @@
                 </div>
 
                 <div class="form-group">
-                    <label>URL Gambar</label>
-                    <input type="url" name="image_url" value="<%= concert.image_url || '' %>">
+                    <label>Gambar Konser</label>
+                    <% if (concert.image_url) { %>
+                        <div style="margin-bottom: 10px;">
+                            <img src="<%= concert.image_url %>" alt="Current Image" style="max-width: 300px; max-height: 200px; object-fit: cover; border-radius: 5px;">
+                            <p style="font-size: 12px; color: #666; margin-top: 5px;">Gambar saat ini</p>
+                        </div>
+                    <% } %>
+                    <input type="file" name="image" accept="image/*">
+                    <small>Upload gambar baru untuk mengganti (Format: JPG, PNG, GIF, Maks 5MB). Kosongkan jika tidak ingin mengganti.</small>
                 </div>
 
                 <div class="form-actions">

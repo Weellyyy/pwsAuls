@@ -42,7 +42,7 @@ router.get('/dashboard', adminController.dashboard);
 router.get('/concerts/add', adminController.showAddConcert);
 router.post('/concerts/add', upload.single('image'), adminController.addConcert);
 router.get('/concerts/edit/:id', adminController.showEditConcert);
-router.post('/concerts/edit/:id', adminController.editConcert);
+router.post('/concerts/edit/:id', upload.single('image'), adminController.editConcert);
 router.post('/concerts/delete/:id', adminController.deleteConcert);
 
 module.exports = router;
